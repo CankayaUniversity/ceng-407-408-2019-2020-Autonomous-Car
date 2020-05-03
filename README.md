@@ -8,6 +8,7 @@ For Simulation environment Webots has been used on this project:
   <img width="70" height="70" src="https://user-images.githubusercontent.com/48088166/80218484-e622db00-8649-11ea-9bbc-fcdd38adc52a.png">
 </p>
 
+
   [Download Webots](https://cyberbotics.com/#download)
 
 After download the program download [Python 2.7](https://www.python.org/download/releases/2.7/) or [ Python 3.7 ](https://www.python.org/downloads/release/python-370/)
@@ -31,6 +32,10 @@ pip install pickle
 
 After these you can simply open the .wbt file on the project. And just start by clicking play button.
 ![img](https://user-images.githubusercontent.com/48088166/80228008-2ccb0200-8657-11ea-87fd-906462daa9e4.png)
+>You can watch the video by clicking on it 
+      ↓
+      
+>[<img src="https://img.youtube.com/vi/yzqMefa35yY/maxresdefault.jpg" width="50%">](https://youtu.be/yzqMefa35yY)
 
 
 >To be able to see distance sensor rays use ctrl+F10. <br>
@@ -40,7 +45,6 @@ On the sample projects you can find a same named .wbt file we edited that world 
 
 If you want to look at the codes or develop more features on the project : File> Open Text File and choose any .py 
 or for using PyCharm on it you can follow this [manual](https://cyberbotics.com/doc/guide/using-your-ide)
-
 
 
 
