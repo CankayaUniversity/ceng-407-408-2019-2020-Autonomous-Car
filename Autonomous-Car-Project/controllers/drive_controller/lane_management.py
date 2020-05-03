@@ -13,10 +13,10 @@ from controller import Display
 height = 256
 width = 512
 region_of_interest_vertices = [
-    (0, height),
-    (width / 2 - 100, height / 1.6),
-    (width / 2 + 100, height / 1.6),
-    (width, height),
+    (70, height),
+    (width / 2 - 80, height / 1.6),
+    (width / 2 + 80, height / 1.6),
+    (width - 70, height),
 ]
 right_lines = np.empty((0, 4), dtype=np.uint8)
 left_lines = np.empty((0, 4), dtype=np.uint8)
@@ -72,18 +72,18 @@ def right_left_finder(lines):
     for n in range(0, len(lines)):
         line = lines[n][0]
         # Calculate slope
-        if line[2] - line[0] == 0.:  # corner case, avoiding division by 0
-            # practically infinite slope slope = 999.
+        if line[2] - line[0] == 0.:  # avoiding division by 0
+            # infinite slope
             break
         elif line[1] - line[3] == 0.:
-            # horizontal line  slope = 0.
+            # horizontal line
             break
         else:
             slope = (line[3] - line[1]) / (line[2] - line[0])
-            if 0.2 < abs(slope) < 1.:
-                if slope > 0 and line[0] > (width / 2)+10 and line[2] > (width / 2)+10:
+            if 0.2 < abs(slope) < 0.5:
+                if slope > 0 and line[0] > (width / 2) + 10 and line[2] > (width / 2) + 10:
                     right_lines = np.append(right_lines, np.array([line]), axis=0)
-                elif slope < 0 and line[0] < (width / 2)-10 and line[2] < (width / 2)-10:
+                elif slope < 0 and line[0] < (width / 2) - 10 and line[2] < (width / 2) - 10:
                     left_lines = np.append(left_lines, np.array([line]), axis=0)
     if len(right_lines) > 1:
         right_lines = reduce_lines(right_lines)
@@ -112,7 +112,7 @@ center_of_the_lane = None
 #  (target on display)*gps/( gps's value on display)
 def toGPS_val(val):
     global gps
-    res = (val * gps) / (width/2)
+    res = (val * gps) / (width / 2)
     return res
 
 
@@ -121,27 +121,41 @@ def toGPS_val(val):
 
 # Find center of lanes and Draw lines on the original image
 def draw_lines(image, lines):
-    E = width/3  # a constant value to stay this much far from lane (only used when we can detect one line)
+    E = 75  # a constant value to stay this much far from lane (only used when we can detect one line)
     global left_lines
     global right_lines
     global center_of_the_lane
+    global lane_change
+
+    """------------------------------------------------------------------------------------------------------------"""
+    # switch lane directions to change lane
+    if lane_change == "right" and len(right_lines) > 0:
+        left_lines = right_lines
+        right_lines = np.empty((0, 4), dtype=np.uint8)
+    elif lane_change == "left" and len(left_lines) > 0:
+        right_lines = left_lines
+        left_lines = np.empty((0, 4), dtype=np.uint8)
+    """------------------------------------------------------------------------------------------------------------"""
+    # decide center of line
     if len(right_lines) > 0:
         r_mean = np.mean(right_lines, axis=0)
     if len(left_lines) > 0:
         l_mean = np.mean(left_lines, axis=0)
     try:
         if len(right_lines) == 0 and len(left_lines) > 0:
-            center_of_the_lane = toGPS_val(l_mean[0]+E)
+            center_of_the_lane = toGPS_val(l_mean[0] + E + 50)
         elif len(left_lines) == 0 and len(right_lines) > 0:
-            center_of_the_lane = toGPS_val(r_mean[0]-E)
+            center_of_the_lane = toGPS_val(r_mean[0] - E)
         elif len(right_lines) > 0 and len(left_lines) > 0:
             center_of_the_lane = toGPS_val(((((((r_mean[2] + r_mean[0]) / 2) - ((l_mean[2] + l_mean[0]) / 2)) / 2) + (
                     (l_mean[2] + l_mean[0]) / 2))))
     except ValueError:
         print("An exception occurred")
         center_of_the_lane = gps
+    """------------------------------------------------------------------------------------------------------------"""
+    # draw center of line to display screen
     blank_img = np.zeros((image.shape[0], image.shape[1], image.shape[2]), dtype=np.uint8)
-
+    """------------------------------------------------------------------------------------------------------------"""
     for x in range(0, len(lines)):
         line = lines[x]
         # I don't know why but it does not works when I write values directly as line[0]
@@ -151,10 +165,9 @@ def draw_lines(image, lines):
         y2 = line[3]
         pts = np.array([[x1, y1], [x2, y2]], np.int32)
         cv2.polylines(blank_img, [pts], True, (0, 255, 0), thickness=3)
-
+    """------------------------------------------------------------------------------------------------------------"""
     # Merge two images
     image = cv2.addWeighted(image, 0.8, blank_img, 1, 0.0)
-
     # cv2.imshow("center",image)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
@@ -170,70 +183,71 @@ def lane_detecting(image_data):
     global left_lines
 
     # CV2
-    np_arr = np.frombuffer(image_data, dtype=np.uint8).reshape(height, width, 4)
+    image_np = np.frombuffer(image_data, dtype=np.uint8).reshape(height, width, 4)
     # print(type(np_arr))
     # print(np_arr.shape)
-    # convert image to gray image
-    gray_img = cv2.cvtColor(np_arr, cv2.COLOR_BGR2GRAY)
+    gray_img = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
     # if image is all black no need for processing
     if cv2.countNonZero(gray_img) == 0:
         print("couldn't take image data")
         return None
 
-    # Convert to HLS color space
-    hls = cv2.cvtColor(np_arr, cv2.COLOR_BGR2HLS)
+    # Convert to HSV
+    hsv = cv2.cvtColor(image_np, cv2.COLOR_BGR2HSV)
+    result = region_of_interest(hsv, np.array([region_of_interest_vertices], np.int32))
 
-    # Apply bilateral filter with d = 15,
-    # sigmaColor = sigmaSpace = 75.
-    hls = cv2.bilateralFilter(hls, 15, 75, 75)
+    # set color limits
+    low_val = (0, 0, 0)
+    high_val = (179, 45, 96)
 
-    # Crop image
-    cropped_image = region_of_interest(hls, np.array([region_of_interest_vertices], np.int32))
-    # cv2.imshow("cropped", cropped_image)
-    # cv2.waitKey(0)
+    # threshold
+    mask = cv2.inRange(hsv, low_val, high_val)
+    # remove noise
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel=np.ones((8, 8), dtype=np.uint8))
+    # close mask
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel=np.ones((20, 20), dtype=np.uint8))
 
-    # White areas HLS value
-    white_lower = np.array([np.round(0 / 2), np.round(0.75 * 255), np.round(0.00 * 255)])
-    white_upper = np.array([np.round(360 / 2), np.round(1.00 * 255), np.round(0.30 * 255)])
-    white_mask = cv2.inRange(cropped_image, white_lower, white_upper)
+    # improve by drawing the convexhull
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        hull = cv2.convexHull(cnt)
+        cv2.drawContours(mask, [hull], 0, 255, -1)
 
-    # Yellow areas HLS value
-    yellow_lower = np.array([np.round(40 / 2), np.round(0.00 * 255), np.round(0.35 * 255)])
-    yellow_upper = np.array([np.round(80 / 2), np.round(1.00 * 255), np.round(1.00 * 255)])
-    yellow_mask = cv2.inRange(cropped_image, yellow_lower, yellow_upper)
+    # erode
+    mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel=np.ones((5, 5), dtype=np.uint8))
+    road_hsv = cv2.bitwise_and(hsv, hsv, mask=mask)
 
-    # Calculate combined mask, and masked image
-    mask = cv2.bitwise_or(yellow_mask, white_mask)
-    masked = cv2.bitwise_and(cropped_image, cropped_image, mask=mask)
+    # set new color limits
+    low_val = (0, 0, 102)
+    high_val = (179, 255, 255)
 
-    grey_image = cv2.cvtColor(masked, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow("gray", grey_image)
-    # cv2.waitKey(0)
-    kernel_size = 5
-    blur_gray = cv2.GaussianBlur(grey_image, (kernel_size, kernel_size), 0)
-    # cv2.imshow("blur_gray", blur_gray)
-    # cv2.waitKey(0)
-    low_threshold = 50
-    high_threshold = 150
-    edges = cv2.Canny(blur_gray, low_threshold, high_threshold)
-    # cv2.imshow("edges", edges)
-    # cv2.waitKey(0)
-    rho = 1  # distance resolution in pixels of the Hough grid
-    theta = np.pi / 180  # angular resolution in radians of the Hough grid
-    threshold = 10  # minimum number of votes (intersections in Hough grid cell)
-    min_line_length = 20  # minimum number of pixels making up a line
-    max_line_gap = 30  # maximum gap in pixels between connect-able line segments
-    lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]), min_line_length, max_line_gap)
+    # new threshold
+    mask2 = cv2.inRange(road_hsv, low_val, high_val)
+    masked = cv2.bitwise_and(image_np, image_np, mask=mask2)
+    result = region_of_interest(masked, np.array([region_of_interest_vertices], np.int32))
+    result = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+
+    rho = 1  # distance resolution in pixels
+    theta = np.pi / 180  # angular resolution in radians
+    threshold = 5  # minimum number of pixels
+    min_line_length = 10  # minimum distance between lines
+    max_line_gap = 15  # maximum gap between line segments
+    lines = cv2.HoughLinesP(result, rho, theta, threshold, np.array([]), min_line_length, max_line_gap)
 
     if lines is not None:
         reduced_lines = right_left_finder(lines)
-        image_with_lines = draw_lines(np_arr, reduced_lines)
-        right_lines = np.empty([0, 4], dtype=np.uint8)
-        left_lines = np.empty([0, 4], dtype=np.uint8)
+        image_with_lines = draw_lines(image_np, reduced_lines)
+        right_lines = np.empty([0, 4], dtype=np.uint8)  # clear
+        left_lines = np.empty([0, 4], dtype=np.uint8)  # clear
         return image_with_lines
     else:
         print("lanes can not found with image processing")
-        return gps
+        # cv2.imshow("Result", result)
+        # cv2.imshow("Mask", mask)
+        # cv2.imshow("Image", image_np)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        return None
 
 
 """------------------------------------------------------------------------------------------------------------"""
@@ -265,19 +279,22 @@ def display_front_cam():
 """------------------------------------------------------------------------------------------------------------"""
 
 
-def main(m_display_front, m_front_camera, m_auto_drive, m_gps):
+# main to call other functions
+def main(m_display_front, m_front_camera, m_auto_drive, m_gps, m_lane_change):
     global display_front, front_camera
     global auto_drive, gps
+    global lane_change
+    lane_change = m_lane_change
     gps = m_gps
     front_camera = m_front_camera
     display_front = m_display_front
     auto_drive = m_auto_drive
     display_front_cam()
     if center_of_the_lane is not None:
-        return round(center_of_the_lane, 1)
+        return round(center_of_the_lane)
     else:
         print("center could't found")
-        return None
+        return gps
 
 
 if __name__ == '__main__':

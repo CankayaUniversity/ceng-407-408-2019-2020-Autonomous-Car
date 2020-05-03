@@ -19,7 +19,7 @@ print("with the keyboard input e and q you can start or stop siren.")
 
 def main():
     # Emergency mode
-    mode = False
+    mode = True
     while driver.step() != -1:
 
         if keyboard.is_pressed('e'):
@@ -39,7 +39,7 @@ def main():
 
         # If siren is playing then sends emergency signal to cars in front of it in 4 metre.
         if speaker.isSoundPlaying(path) or mode:
-            emergency_message = struct.pack("?i", mode, 1)
+            emergency_message = struct.pack("?", mode)
             emitter.send(emergency_message)
 
         if not red.get():
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # get driver instance
     driver = Driver()
     # set speed of the vehicle
-    driver.setCruisingSpeed(100)
+    driver.setCruisingSpeed(80)
     speaker = driver.getSpeaker("Siren")
 
     # led sensor

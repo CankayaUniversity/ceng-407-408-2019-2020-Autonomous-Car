@@ -8,6 +8,7 @@ import os
 import pickle
 
 
+# function to save data to pickle file
 def storeData(key, value, file):
     # initializing data to be stored in db
     db = {}
@@ -20,14 +21,15 @@ def storeData(key, value, file):
 
     db[key] = value
 
-    # Its important to use binary mode
     with open(file, 'wb') as f:
-        # source, destination
         pickle.dump(db, f)
 
 
+"""------------------------------------------------------------------------------------------------------------"""
+
+
+# function to load data from pickle file
 def loadData(key, file):
-    # for reading also binary mode is important
     db = {}
     if os.path.getsize(file) > 0:
         with open(file, "rb") as f:
@@ -38,7 +40,8 @@ def loadData(key, file):
         value = db[key]
         return value
     else:
-        print("value does not exists")
+        # print("value does not exists")
+        return None
 
 
 if __name__ == '__main__':

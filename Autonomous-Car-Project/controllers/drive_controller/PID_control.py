@@ -8,7 +8,6 @@
 
 import math
 from scipy.integrate import odeint
-
 import Storage
 
 
@@ -21,7 +20,7 @@ def dv_dt(v, u, t, load):
     rho = 1.225  # air density (kg/m^3)
     A = 5.0  # cross-sectional area (m^2)
     Fp = 30  # thrust parameter (N/%pedal)
-    m = 500  # vehicle mass (kg)
+    m = 200  # vehicle mass (kg)
     # derivative of the velocity over time
     res = (1.0 / (m + load)) * ((Fp * u) - (0.5 * rho * Cd * A * v ** 2))
     return res
@@ -43,9 +42,14 @@ def speed_control():
 
 
 def follow_lane_PID(position, targetPosition):
-    Kp = 0.02  # Proportional constant
-    KD = 0.01  # Integral constant
-    KI = 0.005  # Derivative constant
+
+    """
+        For more information about PID on Self Driving Cars:
+            https://www.youtube.com/watch?v=4Y7zG48uHRo
+    """
+    Kp = 0.5  # Proportional constant
+    KI = 0.004  # Integral constant
+    KD = 0.002  # Derivative constant
     e = round((targetPosition-position), 2)  # cross track error
     if follow_lane_PID.previousDiff is None:
         Storage.storeData("follow_lane_PID.previousDiff", e, "PID")
@@ -68,14 +72,15 @@ def follow_lane_PID(position, targetPosition):
 """------------------------------------------------------------------------------------------------------------"""
 
 
-def main(m_auto_drive, m_gps, DF_res, m_first_call):
-    global auto_drive, first_call
+def main(m_auto_drive, m_gps, DF_res):
+    global auto_drive
     auto_drive = m_auto_drive
-    first_call = m_first_call
-    position = m_gps - 4
-    if first_call:
+    first_call = Storage.loadData("first_call", "PID")
+    position = m_gps
+    if first_call is None:
         follow_lane_PID.integral = 0
         follow_lane_PID.previousDiff = None
+        Storage.storeData("first_call", False, "PID")
     speed_control()
     if not math.isnan(position) and not math.isnan(DF_res):
         angle = round(max(min(follow_lane_PID(position, DF_res), 0.2), -0.2), 2)

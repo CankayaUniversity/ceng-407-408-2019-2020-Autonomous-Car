@@ -71,11 +71,10 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.04606975579132973 -0.9920029747447452 -0.11750606664723086 2.547864129392547
-  position -26.630587803081628 11.38935934470322 60.46007677064842
+  orientation 0.016087325860081034 0.6669711028768321 0.744909891110283 3.1464489187200133
+  position -11.11295561757725 62.69566109442152 72.78259959607014
   near 1
   follow "vehicle"
-  followType "Mounted Shot"
   followSmoothness 0
   lensFlare LensFlare {
   }
@@ -93,14 +92,15 @@ DEF FLOOR Solid {
   }
 }
 DEF TOYOTA ToyotaPrius {
-  translation -14.3802 0.4 85.475
+  translation -2.9801 0.4 56.705
   rotation 9.950932848409361e-11 0.9999042862180635 0.013835403960321586 -5.307179586466759e-06
   color 1 1 1
   name "vehicle1"
   controller "EV_controller"
   sensorsSlotFront [
     Emitter {
-      translation 0 0 0.21
+      translation -2.6536e-07 0 0.1
+      rotation 0 1 0 3.14159
       children [
         Shape {
           appearance PBRAppearance {
@@ -115,7 +115,8 @@ DEF TOYOTA ToyotaPrius {
         }
       ]
       type "infra-red"
-      range 4
+      range 15
+      aperture 0.4
       channel -1
     }
   ]
@@ -139,8 +140,8 @@ DEF TOYOTA ToyotaPrius {
             }
             PointLight {
               attenuation 0 0 1
-              color 0 0 0
-              intensity 0.5
+              color 0 0 1
+              intensity 2
               location 0 0.03 0
               on FALSE
               castShadows TRUE
@@ -172,8 +173,8 @@ DEF TOYOTA ToyotaPrius {
             }
             PointLight {
               attenuation 0 0 1
-              color 1 0 0
-              intensity 0.5
+              color 0 0 0
+              intensity 2
               location 0 0.03 0
               on FALSE
               castShadows TRUE
@@ -189,8 +190,8 @@ DEF TOYOTA ToyotaPrius {
   ]
 }
 DEF WEBOTS_VEHICLE0 LincolnMKZ {
-  translation -6.96019 0.499994 85.556
-  rotation 1.6264200603152882e-10 0.999953037082951 0.009691420359403345 -5.307179586466759e-06
+  translation -2.93998 0.499994 73.086
+  rotation -1.626420060315288e-10 -0.9999530370829509 -0.009691420359403345 5.307156870259904e-06
   controller "drive_controller"
   sensorsSlotFront [
     Emitter {
@@ -229,7 +230,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front"
       lookupTable [
         0 0 0
-        20 20 0
+        14 20 0
       ]
       numberOfRays 2
       aperture 0.1
@@ -240,10 +241,10 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front right 0"
       lookupTable [
         0 0 0
-        9 20 0
+        11 20 0
       ]
-      numberOfRays 2
-      aperture 0.1
+      numberOfRays 3
+      aperture 0.2
     }
     DEF FRONT_RIGHT_1 DistanceSensor {
       translation -0.64512585 0.3 -0.29286095
@@ -251,7 +252,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front right 1"
       lookupTable [
         0 0 0
-        4 15 0
+        8 15 0
       ]
       numberOfRays 2
       aperture 0.1
@@ -262,10 +263,10 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front right 2"
       lookupTable [
         0 0 0
-        2 10 0
+        5 10 0
       ]
-      numberOfRays 2
-      aperture 0.1
+      numberOfRays 3
+      aperture 0.3
     }
     DEF FRONT_LEFT_0 DistanceSensor {
       translation 0.650126 0.3 -0.28420069
@@ -273,10 +274,10 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front left 0"
       lookupTable [
         0 0 0
-        9 20 0
+        11 20 0
       ]
-      numberOfRays 2
-      aperture 0.1
+      numberOfRays 3
+      aperture 0.2
     }
     DEF FRONT_LEFT_1 DistanceSensor {
       translation 0.650126 0.3 -0.28420069
@@ -284,7 +285,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front left 1"
       lookupTable [
         0 0 0
-        4 15 0
+        8 15 0
       ]
       numberOfRays 2
       aperture 0.1
@@ -295,10 +296,10 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor front left 2"
       lookupTable [
         0 0 0
-        2 10 0
+        5 10 0
       ]
-      numberOfRays 2
-      aperture 0.2
+      numberOfRays 3
+      aperture 0.3
     }
     Robot {
       translation 0 -5.1051227e-09 0.11
@@ -335,11 +336,12 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
             metalness 0
           }
           geometry Box {
-            size 1.3 0.1 9
+            size 2.5765339751659604 0.1 15.040486347935348
           }
         }
       ]
       type "infra-red"
+      aperture 0.2
       channel -1
     }
     DEF REAR DistanceSensor {
@@ -348,7 +350,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor rear"
       lookupTable [
         0 0 0
-        10 10 0
+        5 10 0
       ]
       numberOfRays 2
       aperture 0.2
@@ -359,10 +361,10 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor rear left"
       lookupTable [
         0 0 0
-        2.5 10 0
+        2 10 0
       ]
       numberOfRays 2
-      aperture 0.2
+      aperture 0.3
     }
     DEF REAR_RIGHT DistanceSensor {
       translation 0.705126 0.3 -0.1889379
@@ -370,7 +372,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor rear right"
       lookupTable [
         0 0 0
-        3 10 0
+        2 10 0
       ]
       numberOfRays 2
       aperture 0.2
@@ -430,10 +432,10 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor right"
       lookupTable [
         0 0 0
-        1.5 4 0
+        4 4 0
       ]
       numberOfRays 2
-      aperture 0.9
+      aperture 1
     }
     DEF LEFT DistanceSensor {
       translation -0.9 0.3 -1.32
@@ -441,7 +443,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
       name "distance sensor left"
       lookupTable [
         0 0 0
-        1.5 4 0
+        4 4 0
       ]
       numberOfRays 2
       aperture 0.9
@@ -454,7 +456,7 @@ DEF WEBOTS_VEHICLE0 LincolnMKZ {
 SumoInterface {
   gui FALSE
   useNetconvert FALSE
-  maxVehicles 5
+  maxVehicles 0
   radius 250
   laneChangeDelay 4
 }
@@ -481,7 +483,54 @@ StraightRoadSegment {
   leftBorder FALSE
   rightBarrier TRUE
   leftBarrier TRUE
+  bottom TRUE
   length 5000
+}
+Rock17cm {
+  translation -7.4901 0.4 148.375
+}
+Rock17cm {
+  translation -6.9001 0.4 145.765
+  name "rock 17 cm(1)"
+}
+Rock17cm {
+  translation -8.0201 0.4 146.785
+  name "rock 17 cm(2)"
+}
+Rock17cm {
+  translation -6.0401 0.4 145.895
+  name "rock 17 cm(3)"
+}
+Rock17cm {
+  translation -7.1601 0.4 147.405
+  name "rock 17 cm(4)"
+}
+Rock17cm {
+  translation -6.4201 0.4 147.375
+  name "rock 17 cm(5)"
+}
+OilBarrel {
+  translation -8.1901 0.4 104.765
+}
+OilBarrel {
+  translation -5.5401 0.4 122.165
+  name "oil barrel(1)"
+}
+OilBarrel {
+  translation -6.4801 0.4 140.885
+  name "oil barrel(2)"
+}
+OilBarrel {
+  translation -8.2601 0.4 142.505
+  name "oil barrel(4)"
+}
+OilBarrel {
+  translation -7.2201 0.4 141.975
+  name "oil barrel(5)"
+}
+OilBarrel {
+  translation -6.2901 0.4 142.225
+  name "oil barrel(3)"
 }
 StraightRoadSegment {
   translation 8.75 0.01 5000
@@ -511,20 +560,20 @@ StraightRoadSegment {
   length 5000
 }
 DEF WEBOTS_VEHICLE1 RangeRoverSportSVRSimple {
-  translation -10.789 0.4 128.887
-  rotation 0 -1 0 0.26179941
+  translation -13.8739 0.4 114.701
+  rotation 0 -1 0 0.261796
   name "vehicle(1)"
 }
 TrafficCone {
-  translation -12.182304 1.7941203e-13 118.18033
+  translation -13.4995 9.45605e-09 110.541
   rotation -3.589793e-09 -1 4.6783094e-09 4.9741884
 }
 TrafficCone {
-  translation -9.4738171 -2.6645353e-14 127.19847
+  translation -13.2638 -2.66454e-14 112.978
   name "traffic cone(1)"
 }
 TrafficCone {
-  translation -10.584217 3.5527136e-15 122.40328
+  translation -15.0342 3.55271e-15 108.393
   name "traffic cone(2)"
 }
 DEF WEBOTS_VEHICLE2 Solid {
@@ -962,6 +1011,11 @@ Solid {
     }
   ]
   name "solid(2)"
+}
+WorkBarrier {
+  translation -6.2681 0.4 144.811
+  rotation 0 1 0 0.523599
+  name "work barrier(1)"
 }
 Forest {
   treesFiles [
