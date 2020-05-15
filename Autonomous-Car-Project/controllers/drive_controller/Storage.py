@@ -10,19 +10,27 @@ import pickle
 
 # function to save data to pickle file
 def storeData(key, value, file):
-    # initializing data to be stored in db
-    db = {}
     # if data exist append new data end write over
-    if os.path.isfile(file) and os.stat(file).st_size > 0:
+    db = loadAll(file)
+    db[key] = value
+    if os.path.isfile(file) and os.stat(file).st_size > 0 and os.path.getsize(file) > 0:
+        with open(file, 'wb') as f:
+            pickle.dump(db, f)
+
+
+"""------------------------------------------------------------------------------------------------------------"""
+
+
+def loadAll(file):
+    # initializing data to be stored in db
+    db = dict()
+    if os.path.isfile(file) and os.stat(file).st_size > 0 and os.path.getsize(file) > 0:
         with open(file, "rb") as f:
             unpickler = pickle.Unpickler(f)
-            # to the value un-pickled
             db = unpickler.load()
-
-    db[key] = value
-
-    with open(file, 'wb') as f:
-        pickle.dump(db, f)
+            return db
+    else:
+        return db
 
 
 """------------------------------------------------------------------------------------------------------------"""
@@ -30,12 +38,7 @@ def storeData(key, value, file):
 
 # function to load data from pickle file
 def loadData(key, file):
-    db = {}
-    if os.path.getsize(file) > 0:
-        with open(file, "rb") as f:
-            unpickler = pickle.Unpickler(f)
-            # to the value un-pickled
-            db = unpickler.load()
+    db = loadAll(file)
     if key in db:
         value = db[key]
         return value
@@ -44,6 +47,22 @@ def loadData(key, file):
         return None
 
 
+"""------------------------------------------------------------------------------------------------------------"""
+
+
+def deleteData(key: str, file: str) -> None:
+    db = dict()
+    db = loadAll(file)
+    if key in db:
+        del db[key]
+
+    with open(file, 'wb') as f:
+        pickle.dump(db, f)
+
+
+"""------------------------------------------------------------------------------------------------------------"""
+
 if __name__ == '__main__':
     storeData()
     loadData()
+    deleteData()

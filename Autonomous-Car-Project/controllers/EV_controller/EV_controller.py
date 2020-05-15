@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # get driver instance
     driver = Driver()
     # set speed of the vehicle
-    driver.setCruisingSpeed(80)
+    driver.setCruisingSpeed(100)
     speaker = driver.getSpeaker("Siren")
 
     # led sensor

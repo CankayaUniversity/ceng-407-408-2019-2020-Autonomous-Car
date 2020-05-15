@@ -5,13 +5,15 @@
     Büşra Nur Bahadır 201511006
 
                                                     """
-import math
-
-"""------------------------------------------------------------------------------------------------------------"""
+import time
+from csv import QUOTE_ALL, writer
+Log = list()
+error_Log = list()
+obj_data, LIDAR_data = None, None
 
 
 def LIDAR_sensor(lidars):
-    """ Ill write necessarily algorithms later"""
+    # TODO
     # left_obstacle = []
     # right_obstacle = []
     # ibeolux_width = lidars[0].getHorizontalResolution()
@@ -25,29 +27,18 @@ def LIDAR_sensor(lidars):
     #             if "right" in key:
     #             left_obstacle += size[i] * (1.0 - lidar_values[i] / max_range)
     # print(lidars)
-    res = 0
-    return res
+    return None
 
 
-"""------------------------------------------------------------------------------------------------------------"""
-# distance sensors
-dist_sensor_names = [
-    "front",
-    "front right 0",
-    "front right 1",
-    "front right 2",
-    "front left 0",
-    "front left 1",
-    "front left 2",
-    "rear",
-    "rear left",
-    "rear right",
-    "right",
-    "left"]
+def dist_sensor(dist_sensors, dist_sensor_names):
+    """
+        To find near objects with distance sensors
+           :param dist_sensor_names: name of the distance sensors for indexing
+           :param dist_sensors: distance sensors
+           :return dictionary which contains the distance sensor names and values of the distance
+           :rtype dict
 
-
-# to find near objects with distance sensors
-def dist_sensor():
+    """
     obj_on_side = {}
     for j in range(len(dist_sensor_names)):
         if dist_sensors[dist_sensor_names[j]].getValue() < dist_sensors[dist_sensor_names[j]].getMaxValue():
@@ -57,33 +48,53 @@ def dist_sensor():
     return obj_on_side
 
 
-"""------------------------------------------------------------------------------------------------------------"""
-
-obj_to_reduce = set(["road", "building", "tree", "hotel"])
-
-
 def cam_obj_rec(camera, string):
+    """
+        To find near objects with camera sensors
+           :param string: str for print
+           :param camera: Camera sensor
+
+    """
+    obj_to_reduce = {"road", "building", "tree", "hotel"}
     cam_objects = camera.getRecognitionObjects()
 
     for i in range(0, len(cam_objects)):
         s1 = set(cam_objects[i].model.split())
         if not bool(s1.intersection(obj_to_reduce)):
+            # may write to Logs later
             print("Model of object at " + string + "{} : {}".format(i, cam_objects[i].model))
-    pass
+            print(cam_objects[i].get_position_on_image())
+            print(cam_objects[i].get_position())
+            print(cam_objects[i].get_size_on_image())
 
 
-"""------------------------------------------------------------------------------------------------------------"""
-
-
-def main(m_lidars, m_dist_sensors, m_front_cam, m_back_cam):
-    global lidars, dist_sensors, front_cam, back_cam
-    lidars = m_lidars
-    dist_sensors = m_dist_sensors
-    obj_data = dist_sensor()
-    LIDAR_data = LIDAR_sensor(lidars)
-    front_cam, back_cam = m_front_cam, m_back_cam
-    # cam_obj_rec(front_cam, "front")
-    # cam_obj_rec(back_cam, "rear")
+def main(dist_sensor_names, lidars, dist_sensors, front_cams, back_camera):
+    """
+           :param back_camera:
+           :param front_cams:
+           :param dist_sensors:
+           :param lidars:
+           :param dist_sensor_names:
+    """
+    global obj_data, LIDAR_data
+    start_time = time.time()
+    Log.clear()
+    error_Log.clear()
+    try:
+        obj_data = dist_sensor(dist_sensors, dist_sensor_names)
+        LIDAR_data = None
+        # cam_obj_rec(front_camera1, "front")
+        # cam_obj_rec(back_cam, "rear")
+        Log.append(str(time.time() - start_time))
+    except Exception as e:
+        error_Log.append("[OBJ] IN OBJ MAIN: %s " % e)
+    with open("Logs\OBJ_Log.csv", 'a') as file:
+        wr = writer(file, quoting=QUOTE_ALL)
+        wr.writerow(Log)
+    if len(error_Log):
+        with open("Logs\error_Log.csv", 'a', newline="") as file:
+            wr = writer(file, quoting=QUOTE_ALL)
+            wr.writerow(error_Log)
     return obj_data, LIDAR_data
 
 
