@@ -28,6 +28,11 @@ pip install scipy
 pip install numpy
 pip install opencv-python
 pip install pickle 
+pip install SpeechRecognition
+pip install gTTS
+pip install playsound
+pip install pipwin
+pipwin install pyaudio
 ```
 
 After these you can simply open the .wbt file on the project. And just start by clicking play button.
@@ -35,11 +40,21 @@ After these you can simply open the .wbt file on the project. And just start by 
 >You can watch the video by clicking on it 
       ↓
       
->[<img src="https://img.youtube.com/vi/yzqMefa35yY/maxresdefault.jpg" width="50%">](https://youtu.be/yzqMefa35yY)
+>[<img src="https://img.youtube.com/vi/yc5FXZfuQuo/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=yc5FXZfuQuo)
 
 
 >To be able to see distance sensor rays use ctrl+F10. <br>
->For enabling to start and stop ambulance siren use e and q keys (currently wav file gives error in other computers we will check and fix as soon as possible).
+>For enabling to start and stop ambulance siren use e and q keys (currently wav file gives error in other computers we will check and fix as soon as possible). <br>
+
+> To call voice assistant just say Jarvis ;)<br>
+> VA responds to => 
+```
+                    speed of the car 
+                    speed up 
+                    slow down 
+                    change lane 
+                    exit 
+```
 
 On the sample projects you can find a same named .wbt file we edited that world environment to use for testing our codes.
 
